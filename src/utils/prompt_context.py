@@ -35,6 +35,11 @@ def get_storage_backend() -> str:
         # If we're running in ECS or have AWS credentials, use DynamoDB
         # Otherwise, use file-based storage
         
+        # Check if we have a DynamoDB endpoint configured (local dev with DynamoDB)
+        if os.environ.get('DYNAMODB_ENDPOINT') or os.environ.get('DYNAMODB_TABLE_NAME') or os.environ.get('DYNAMODB_TABLE'):
+            logger.info("Detected DynamoDB configuration, using DynamoDB storage")
+            return 'dynamodb'
+        
         # Check if we're in ECS
         if os.environ.get('ECS_CONTAINER_METADATA_URI'):
             logger.info("Detected ECS environment, using DynamoDB storage")
