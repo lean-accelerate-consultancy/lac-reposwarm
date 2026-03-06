@@ -46,6 +46,22 @@ reposwarm dashboard               # Watch it work
 
 That's it. The CLI handles setup, configuration, investigation, diagnostics, and results — all from a single binary.
 
+### Prerequisites
+
+- **Docker must be running** (not just installed) — needed for Temporal and local DynamoDB
+- Python 3.11+ for the worker
+- Node.js 22+ for the API server
+
+### Bedrock Users
+
+If using Amazon Bedrock, the worker needs these env vars (set automatically by the CLI):
+- `CLAUDE_CODE_USE_BEDROCK=1`
+- `CLAUDE_PROVIDER=bedrock`
+- `AWS_REGION=us-east-1` (or your region)
+
+Auth options: IAM role (recommended), access keys, AWS profile, or Bedrock API keys.
+See [CLI docs](https://github.com/reposwarm/reposwarm-cli#-configure-llm-provider) for setup.
+
 👉 **Full CLI docs:** [**reposwarm-cli**](https://github.com/reposwarm/reposwarm-cli)
 
 ---
