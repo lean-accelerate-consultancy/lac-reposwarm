@@ -81,20 +81,9 @@ Check out [RepoSwarm's self-analysis](https://github.com/royosherove/repo-swarm-
 
 ## How It Works
 
-```mermaid
-graph TB
-    A[Your Repositories] -->|New commits detected| B[RepoSwarm Engine]
-    B -->|Temporal Workflow| C[Clone & Analyze]
-    C -->|Claude AI Analysis| D[Generate .arch.md]
-    D -->|Cache in DynamoDB| E[Store Results]
-    E -->|Auto-commit| F[Results Hub Repository]
-    F -->|Query with AI| G[Reports & Insights]
-    
-    style A fill:#e1f5fe,color:#000
-    style B fill:#fff3e0,color:#000
-    style F fill:#f3e5f5,color:#000
-    style G fill:#e8f5e8,color:#000
-```
+<p align="center">
+  <img src="assets/architecture.png" alt="RepoSwarm Architecture" width="100%">
+</p>
 
 **Pipeline:** Cache check → Clone → Type detection → Structure analysis → Prompt selection → AI analysis → Store results → Cleanup
 
@@ -188,10 +177,6 @@ Or edit `prompts/repos.json` directly:
 ---
 
 ## Ecosystem
-
-<p align="center">
-  <img src="assets/architecture.png" alt="RepoSwarm Architecture" width="100%">
-</p>
 
 | Project | Description | Install |
 |---------|-------------|---------|
