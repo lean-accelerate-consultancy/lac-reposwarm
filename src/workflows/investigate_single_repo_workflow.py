@@ -763,11 +763,11 @@ class InvestigateSingleRepoWorkflow:
                 "error": hub_result.error
             }
 
-            # If architecture hub save failed, fail the entire workflow
+            # If architecture hub save failed, log warning but don't fail the workflow
+            # All analysis steps completed — arch-hub save is optional (may not be configured)
             if hub_result.status == "failed":
-                error_msg = f"Architecture hub save failed: {hub_result.message}"
-                logger.error(error_msg)
-                raise Exception(error_msg)
+                logger.warning(f"Architecture hub save failed (non-fatal): {hub_result.message}")
+                logger.warning("Investigation results are still available via 'reposwarm results' commands")
         else:
             logger.info(f"Skipping architecture hub save for {repo_name} - investigation not successful or no content")
             investigation_result.architecture_hub = {
