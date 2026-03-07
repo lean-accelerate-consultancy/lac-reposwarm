@@ -239,7 +239,7 @@ class GitRepositoryManager:
 
             # Add token authentication
             # GitHub accepts the token as username with no password
-            auth_netloc = f"{self.github_token}@{parsed.hostname}"
+            auth_netloc = f"x-access-token:{self.github_token}@{parsed.hostname}"
             if parsed.port:
                 auth_netloc += f":{parsed.port}"
 
@@ -591,7 +591,7 @@ class GitRepositoryManager:
                     # Check if it's GitHub
                     if 'github.com' in current_url and self.github_token:
                         if current_url.startswith('https://'):
-                            auth_url = current_url.replace('https://', f'https://{self.github_token}@')
+                            auth_url = current_url.replace('https://', f'https://x-access-token:{self.github_token}@')
                             self.logger.info("Updating remote URL with GitHub token for push")
                             subprocess.run(
                                 ["git", "remote", "set-url", "origin", auth_url],
