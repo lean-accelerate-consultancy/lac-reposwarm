@@ -13,8 +13,9 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Create a non-root user
-RUN useradd --create-home --shell /bin/bash app
+# Create a non-root user and working directory
+RUN useradd --create-home --shell /bin/bash app \
+    && mkdir -p /app && chown app:app /app
 USER app
 
 # Install uv for fast Python package management
