@@ -97,7 +97,7 @@ class TestBedrockAdapter:
                 assert model_id == "us.anthropic.claude-haiku-4-5-20251001-v1:0"
 
     def test_bedrock_model_mapping_unmapped_model(self):
-        """Test that unmapped models are returned as-is with a warning."""
+        """Test that unmapped models are returned as-is with an info message."""
         with patch.dict(os.environ, {'CLAUDE_PROVIDER': 'bedrock'}):
             with patch('anthropic.AnthropicBedrock'):
                 mock_logger = Mock()
@@ -106,7 +106,7 @@ class TestBedrockAdapter:
                 model_id = analyzer._get_model_id("claude-unknown-model")
 
                 assert model_id == "claude-unknown-model"
-                mock_logger.warning.assert_called_with(
+                mock_logger.info.assert_called_with(
                     "No Bedrock mapping for claude-unknown-model, using as-is"
                 )
 

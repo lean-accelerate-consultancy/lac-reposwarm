@@ -58,7 +58,7 @@ class ClaudeAnalyzer:
                 self.logger.debug(f"Mapped {model_name} to Bedrock model {bedrock_model}")
                 return bedrock_model
             else:
-                self.logger.warning(f"No Bedrock mapping for {model_name}, using as-is")
+                self.logger.info(f"No Bedrock mapping for {model_name}, using as-is")
                 return model_name
         return model_name
 
