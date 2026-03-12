@@ -659,6 +659,8 @@ class InvestigateSingleRepoWorkflow:
         logger.info(f"Starting investigation for repository: {repo_name} (type: {repo_type})")
         if force:
             logger.info(f"⚡ Force mode enabled for {repo_name} - will investigate regardless of cache")
+            # Propagate force to config_overrides so prompt-level cache is also bypassed
+            config_overrides.force_section = "__all__"
         
         # Step 0: DynamoDB Health Check
         await self._perform_health_check()

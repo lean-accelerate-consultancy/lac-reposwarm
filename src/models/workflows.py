@@ -17,7 +17,7 @@ class ConfigOverrides(BaseModel):
     temperature: Optional[float] = Field(None, ge=0.0, le=1.0, description="Temperature for Claude response")
     sleep_hours: Optional[float] = Field(None, ge=0.1, le=168.0, description="Hours to sleep between executions")
     chunk_size: Optional[int] = Field(None, ge=1, le=100, description="Number of repos to process in parallel")
-    force_section: Optional[str] = Field(None, description="Force re-execution of specific section (prompt name)")
+    force_section: Optional[str] = Field(None, description="Force re-execution of specific section (prompt name), or '__all__' to bypass all prompt caches")
     
     @validator('claude_model')
     def validate_claude_model(cls, v):

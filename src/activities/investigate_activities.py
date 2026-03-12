@@ -1008,7 +1008,7 @@ async def analyze_with_claude_context(input_params: AnalyzeWithClaudeInput) -> A
             
             # Check if this step should be forced (bypass cache)
             force_section = getattr(config_overrides, 'force_section', None) if config_overrides else None
-            should_force_this_step = force_section and force_section == step_name
+            should_force_this_step = force_section and (force_section == step_name or force_section == "__all__")
             
             if should_force_this_step:
                 activity.logger.info(f"🚀 Force section enabled for {step_name} - skipping cache check")
