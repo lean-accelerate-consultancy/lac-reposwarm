@@ -64,6 +64,8 @@ class Config:
     ARCH_HUB_REPO_NAME = os.getenv("ARCH_HUB_REPO_NAME", "architecture-hub")
     ARCH_HUB_BASE_URL = os.getenv("ARCH_HUB_BASE_URL", "https://github.com/your-org")
     ARCH_HUB_FILES_DIR = os.getenv("ARCH_HUB_FILES_DIR", "")  # Empty string means root directory
+    ARCH_HUB_MODE = os.getenv("ARCH_HUB_MODE", "git")  # "git" or "local"
+    ARCH_HUB_LOCAL_PATH = os.getenv("ARCH_HUB_LOCAL_PATH", "")  # Local path for mode=local
     
     # Repository scanning configuration
     # DEFAULT_ORG_NAME supports both GitHub organizations and individual user accounts

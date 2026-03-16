@@ -545,6 +545,53 @@ def _read_arch_file_content(arch_file_path: str) -> str:
         return f"Error reading arch file: {str(e)}"
 
 
+async def _save_to_arch_hub_local(arch_files: list) -> dict:
+    """Save architecture files to a local directory instead of git."""
+    from investigator.core.config import Config
+
+    local_path = Config.ARCH_HUB_LOCAL_PATH
+    if not local_path:
+        return {"status": "error", "message": "ARCH_HUB_LOCAL_PATH not set"}
+
+    os.makedirs(local_path, exist_ok=True)
+
+    # Determine target dir (with optional ARCH_HUB_FILES_DIR subdirectory)
+    if Config.ARCH_HUB_FILES_DIR:
+        target_dir = os.path.join(local_path, Config.ARCH_HUB_FILES_DIR)
+        os.makedirs(target_dir, exist_ok=True)
+    else:
+        target_dir = local_path
+
+    saved_files = []
+    for arch_data in arch_files:
+        repo_name = arch_data.get("repo_name")
+        arch_content = arch_data.get("arch_file_content", "")
+        if not repo_name or not arch_content:
+            continue
+
+        filename = f"{repo_name}.arch.md"
+        file_path = os.path.join(target_dir, filename)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(arch_content)
+        saved_files.append(filename)
+        activity.logger.info(f"Saved architecture file locally: {file_path}")
+        try:
+            activity.heartbeat(f"local:saved:{filename}")
+        except Exception:
+            pass
+
+    if not saved_files:
+        return {"status": "completed", "message": "No architecture files to save", "files_saved": []}
+
+    activity.logger.info(f"Saved {len(saved_files)} files to {target_dir}")
+    return {
+        "status": "success",
+        "message": f"Saved {len(saved_files)} architecture files locally",
+        "files_saved": saved_files,
+        "local_path": local_path
+    }
+
+
 @activity.defn
 async def save_to_arch_hub(arch_files: list) -> dict:
     """
@@ -561,6 +608,27 @@ async def save_to_arch_hub(arch_files: list) -> dict:
     from datetime import datetime
     # Import here to avoid workflow sandbox issues
     from investigator.core.config import Config
+
+    # Local file save mode — skip git entirely
+    if Config.ARCH_HUB_MODE == "local":
+        activity.logger.info("Using local file save mode (ARCH_HUB_MODE=local)")
+        try:
+            activity.heartbeat("start:save_to_arch_hub_local")
+        except Exception:
+            pass
+        return await _save_to_arch_hub_local(arch_files)
+    
+    # Skip if arch-hub is not configured (still using default placeholder URL)
+    if Config.ARCH_HUB_BASE_URL in ("https://github.com/your-org", ""):
+        activity.logger.warning("Architecture hub not configured — skipping save. "
+                              "Set up with: reposwarm config arch-hub local <path> "
+                              "or: reposwarm config arch-hub github --url <url>")
+        return {
+            "status": "skipped",
+            "message": "Architecture hub not configured (ARCH_HUB_BASE_URL is default placeholder). "
+                       "Configure with: reposwarm config arch-hub local <path>",
+            "files_saved": []
+        }
     
     activity.logger.info(f"Starting to save architecture files to {Config.ARCH_HUB_REPO_NAME}")
     try:
@@ -940,7 +1008,7 @@ async def analyze_with_claude_context(input_params: AnalyzeWithClaudeInput) -> A
             
             # Check if this step should be forced (bypass cache)
             force_section = getattr(config_overrides, 'force_section', None) if config_overrides else None
-            should_force_this_step = force_section and force_section == step_name
+            should_force_this_step = force_section and (force_section == step_name or force_section == "__all__")
             
             if should_force_this_step:
                 activity.logger.info(f"🚀 Force section enabled for {step_name} - skipping cache check")

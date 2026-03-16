@@ -973,6 +973,8 @@ class InvestigateSingleRepoWorkflow:
         logger.info(f"Starting investigation for repository: {repo_name} (type: {repo_type})")
         if force:
             logger.info(f"⚡ Force mode enabled for {repo_name} - will investigate regardless of cache")
+            # Propagate force to config_overrides so prompt-level cache is also bypassed
+            config_overrides.force_section = "__all__"
         
         # Step 0: DynamoDB Health Check
         await self._perform_health_check()
@@ -1118,11 +1120,13 @@ class InvestigateSingleRepoWorkflow:
                 "error": hub_result.error
             }
 
-            # If architecture hub save failed, fail the entire workflow
+            # If architecture hub save failed (not skipped), fail the entire workflow
             if hub_result.status == "failed":
                 error_msg = f"Architecture hub save failed: {hub_result.message}"
                 logger.error(error_msg)
                 raise Exception(error_msg)
+            elif hub_result.status == "skipped":
+                logger.info(f"Architecture hub save skipped for {repo_name}: {hub_result.message}")
         else:
             logger.info(f"Skipping architecture hub save for {repo_name} - investigation not successful or no content")
             investigation_result.architecture_hub = {
